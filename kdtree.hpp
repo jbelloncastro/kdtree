@@ -16,7 +16,7 @@ class RelaxedKDTree
 {
 	public:
 		typedef T                                   Key;
-		typedef detail::mask_type                   Mask;
+		typedef detail::mask_type<T>                Mask;
 		typedef detail::relaxed_kdtree_node_base<T> Node;
 
 		RelaxedKDTree() :
@@ -38,10 +38,14 @@ class RelaxedKDTree
 
 		bool insert( const Key& k )
 		{
-			if( empty() )
+			bool inserted = false;
+			if( empty() ) {
 				_root = Node::create_node( k );
-			else
-				_root->insert( k );
+				inserted = true;
+			} else {
+				inserted = _root->insert( k );
+			}
+			return inserted;
 		}
 
 		// Exact search
