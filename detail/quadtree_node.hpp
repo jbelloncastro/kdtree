@@ -26,13 +26,34 @@
 namespace ads {
 namespace detail {
 
+template< typename T, std::size_t d = std::tuple_size<T>::value-1 >
+struct find_position
+{
+	constexpr
+	std::size_t operator()( const T& k1, const T& k2 )
+	{
+		return find_position<T,d-1>()(k1,k2)
+		      | ((std::get<d>(k1) < std::get<d>(k2)) << d);
+	}
+};
+
+template< typename T >
+struct find_position<T,0>
+{
+	constexpr
+	std::size_t operator()( const T& k1, const T& k2 )
+	{
+		return std::get<0>(k1) < std::get<0>(k2);
+	}
+};
+
 template< typename Node, std::size_t d = std::tuple_size<typename Node::Key>::value-1 >
 struct forward_partial_match
 {
 	typedef typename Node::Key  Key;
 	typedef typename Node::Mask Mask;
 
-	std::list<const Key*> operator()( const Node& node, const Key& k, const Mask& m, std::size_t position )
+	std::list<const Key*> operator()( const Node& node, const Key& k, const Mask& m, std::size_t position = 0 )
 	{
 		using next_level = forward_partial_match<Node,d-1>;
 
@@ -58,7 +79,7 @@ struct forward_partial_match<Node,-1>
 
 	std::list<const Key*> operator()( const Node& node, const Key& k, const Mask& m, std::size_t position )
 	{
-		return node._successor[position]->find( k, m );
+		return node._successors[position]->find( k, m );
 	}
 };
 
@@ -74,27 +95,25 @@ struct quadtree_node
 	typedef quadtree_node<T>             Node;
 	typedef std::array<Node*,power(2ul,D)> SuccessorTable;
 
-	constexpr
-	std::size_t find_position( const Key& k, std::size_t dim = D-1 )
+	quadtree_node( const Key& k ) :
+		_successors(),
+		_key(k)
 	{
-		return dim==0?
-			std::get<dim>(_key) < std::get<dim>(k) :
-			(std::get<dim>(_key) < std::get<dim>(k))<<dim;
 	}
 
 	// Function members
 	bool insert( const Key& k )
 	{
 		bool inserted = false;
-		std::size_t spot = find_position(k);
-		// Note: spot is 0 if all dimension comparisons
+		std::size_t pos = find_position<Key>()(_key,k);
+		// Note: pos is 0 if all dimension comparisons
 		// are greater or equal
-		if( spot == 0 && _key == k ) {
+		if( pos == 0 && _key == k ) {
 			inserted = false;
-		} else if( _successors[spot] ) {
-			inserted = _successors[spot]->insert(k);
+		} else if( _successors[pos] ) {
+			inserted = _successors[pos]->insert(k);
 		} else {
-			_successors[spot] = new quadtree_node(k);
+			_successors[pos] = new quadtree_node(k);
 			inserted = true;
 		}
 		return inserted;
@@ -103,11 +122,11 @@ struct quadtree_node
 	// Exact search
 	const Key* find( const Key& k ) const
 	{
-		std::size_t spot = find_spot(k);
-		if( spot == 0 && _key == k ) {
+		std::size_t pos = find_position<Key>()(_key,k);
+		if( pos == 0 && _key == k ) {
 			return &k;
-		} else if( _successors[spot] ) {
-			return _successors[spot]->find(k);
+		} else if( _successors[pos] ) {
+			return _successors[pos]->find(k);
 		} else {
 			return nullptr;
 		}
@@ -122,8 +141,13 @@ struct quadtree_node
 		}
 
 		list.splice( list.begin(),
-			forward_partial_match<Node>( _key, k, m ) );
+			forward_partial_match<Node>()( _key, k, m ) );
 		return list;
+	}
+
+	static Node* create_node( const Key& k )
+	{
+		return new quadtree_node<Key>(k);
 	}
 
 	// Data members
