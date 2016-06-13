@@ -1,9 +1,7 @@
 CXX=g++
-CXXFLAGS=-std=c++11
+CXXFLAGS=-O3 -std=c++11
 
-all: test
-
-test: test.cc
+all: test benchmark
 
 clean:
-	rm -f test
+	rm -f test benchmark
