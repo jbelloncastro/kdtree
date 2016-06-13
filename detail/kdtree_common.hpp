@@ -20,11 +20,13 @@
 #ifndef KDTREE_COMMON
 #define KDTREE_COMMON
 
+#include <bitset>
+
 namespace ads {
 namespace detail {
 
 template< typename T >
-using mask_type = std::array<bool, std::tuple_size<T>::value>;
+using mask_type = std::bitset<std::tuple_size<T>::value>;
 
 template < typename T, std::size_t I = std::tuple_size<T>::value-1 >
 struct matches_partially
@@ -32,7 +34,7 @@ struct matches_partially
 	bool operator()( const T& lhs, const T& rhs, const mask_type<T>& mask )
 	{
 		return matches_partially<T,I>()(lhs, rhs, mask) &&
-		       ( !std::get<I>(mask) ||
+		       ( !mask[I] ||
 		         std::get<I>(lhs) == std::get<I>(rhs) );
 	}
 };
@@ -42,7 +44,7 @@ struct matches_partially<T,0>
 {
 	bool operator() ( const T& lhs, const T& rhs, const mask_type<T>& mask )
 	{
-		return !std::get<0>(mask) || std::get<0>(lhs) == std::get<0>(rhs);
+		return !mask[0] || std::get<0>(lhs) == std::get<0>(rhs);
 	}
 };
 

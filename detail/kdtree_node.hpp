@@ -111,7 +111,7 @@ struct kdtree_node
 	std::list<const Key*> find( const Key& k2, const mask_type<T>& mask ) const
 	{
 		std::list<const Key*> list;
-		const bool ignore_dimension = std::get<discriminant>(mask);
+		const bool ignore_dimension = mask[discriminant];
 		const bool left = ignore_dimension
 		               || std::get<discriminant>(_key) < std::get<discriminant>(k2);
 		const bool right = ignore_dimension || !left;
