@@ -3,8 +3,16 @@
 
 #include <iostream>
 
+typedef std::tuple<int,char> Key;
+
 int main() {
-	ads::relaxed_kdtree<std::tuple<int,char> > tree;
+#ifdef USE_STANDARD
+	ads::standard_kdtree<Key> tree;
+#elif USE_QUADTREE
+	ads::quadtree<Key> tree;
+#else
+	ads::relaxed_kdtree<Key> tree;
+#endif
 	for( int i = 0; i < 10; i++ ) {
 			tree.insert( std::make_tuple(i,'a'+i) );
 	}

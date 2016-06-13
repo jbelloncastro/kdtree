@@ -26,12 +26,12 @@ Mask generateMask() {
 
 int main( int argc, char* argv[] )
 {
-#ifndef USE_STANDARD
-	ads::relaxed_kdtree<Key> tree;
-#elif USE_QUADTREE
-	ads::quadtree<Key> tree;
-#else
+#ifdef USE_STANDARD
 	ads::standard_kdtree<Key> tree;
+#elif   USE_QUADTREE
+	ads::quadtree<Key> tree;
+#else   // RELAXED
+	ads::relaxed_kdtree<Key> tree;
 #endif
 
 	std::size_t inserted_elements;
