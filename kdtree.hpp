@@ -22,27 +22,28 @@
 
 #include "detail/kdtree_traits.hpp"
 #include "detail/kdtree_node.hpp"
+#include "detail/relaxed_kdtree_node.hpp"
 
 #include <random>
 
 namespace ads {
 
 template < typename T,
+	typename Node,
 	typename = traits::require_kdtree_valid_datatype<T>
 	>
-class RelaxedKDTree
+class generic_kdtree
 {
 	public:
-		typedef T                                   Key;
-		typedef detail::mask_type<T>                Mask;
-		typedef detail::relaxed_kdtree_node_base<T> Node;
+		typedef T                    Key;
+		typedef detail::mask_type<T> Mask;
 
-		RelaxedKDTree() :
+		generic_kdtree() :
 			_root(nullptr)
 		{
 		}
 
-		RelaxedKDTree( std::initializer_list<Key> ilist ) :
+		generic_kdtree( std::initializer_list<Key> ilist ) :
 			_root(nullptr)
 		{
 			for( const Key& item : ilist )
@@ -98,6 +99,12 @@ class RelaxedKDTree
 	private:
 		Node* _root;
 };
+
+template < typename T >
+using relaxed_kdtree = generic_kdtree<T, detail::relaxed_kdtree_node_base<T> >;
+
+template < typename T >
+using standard_kdtree = generic_kdtree<T, detail::kdtree_node<T> >;
 
 } // namespace ads
 
