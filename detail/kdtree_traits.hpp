@@ -43,12 +43,6 @@ template< typename T >
 using require_kdtree_valid_datatype = typename
   std::enable_if<is_kdtree_valid_datatype<T>::value>::type;
 
-template< typename Integral >
-constexpr Integral power( Integral base, Integral exp )
-{
-	return exp==0? 1: base*power(base,exp-1);
-}
-
 } // namespace traits
 } // namespace ads
 

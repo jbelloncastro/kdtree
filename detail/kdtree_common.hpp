@@ -28,6 +28,12 @@ namespace detail {
 template< typename T >
 using mask_type = std::bitset<std::tuple_size<T>::value>;
 
+template< typename Integral >
+constexpr Integral power( Integral base, Integral exp )
+{
+	return exp==0? 1: base*power(base,exp-1);
+}
+
 template < typename T, std::size_t I = std::tuple_size<T>::value-1 >
 struct matches_partially
 {

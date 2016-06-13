@@ -22,9 +22,8 @@
 
 #include "detail/kdtree_traits.hpp"
 #include "detail/kdtree_node.hpp"
+#include "detail/quadtree_node.hpp"
 #include "detail/relaxed_kdtree_node.hpp"
-
-#include <random>
 
 namespace ads {
 
@@ -105,6 +104,9 @@ using relaxed_kdtree = generic_kdtree<T, detail::relaxed_kdtree_node_base<T> >;
 
 template < typename T >
 using standard_kdtree = generic_kdtree<T, detail::kdtree_node<T> >;
+
+template < typename T >
+using quadtree = generic_kdtree<T, detail::quadtree_node<T> >;
 
 } // namespace ads
 
