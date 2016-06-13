@@ -1,7 +1,6 @@
 
 #include "kdtree.hpp"
 
-#include <iostream>
 #include <random>
 
 typedef std::tuple<int,char,float> Key;
@@ -25,21 +24,33 @@ Mask generateMask() {
 	return Mask( mask_dist(gen) );
 }
 
-int main( int argc, char* argv[] ) {
+int main( int argc, char* argv[] )
+{
 #ifndef USE_STANDARD
 	ads::relaxed_kdtree<Key> tree;
+#elif USE_QUADTREE
+	ads::quadtree<Key> tree;
 #else
 	ads::standard_kdtree<Key> tree;
 #endif
 
-	std::size_t elements = 10000;
+	std::size_t inserted_elements;
+	std::size_t searched_elements;
+
 	if( argc > 1 )
-		elements = atoi(argv[1]);
+		inserted_elements = atoi(argv[1]);
+	else
+		inserted_elements = 10000;
+
+	if( argc > 2 )
+		searched_elements = atoi(argv[2]);
+	else
+		searched_elements = inserted_elements;
 		
-	for( int i = 0; i < elements; i++ ) {
+	for( int i = 0; i < inserted_elements; i++ ) {
 		tree.insert( generateKey() );
 	}
-	for( int i = 0; i < elements; i++ ) {
+	for( int i = 0; i < searched_elements; i++ ) {
 		tree.find( generateKey(), generateMask() );
 	}
 
