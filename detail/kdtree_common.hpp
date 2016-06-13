@@ -33,7 +33,7 @@ struct matches_partially
 {
 	bool operator()( const T& lhs, const T& rhs, const mask_type<T>& mask )
 	{
-		return matches_partially<T,I>()(lhs, rhs, mask) &&
+		return matches_partially<T,I-1>()(lhs, rhs, mask) &&
 		       ( !mask[I] ||
 		         std::get<I>(lhs) == std::get<I>(rhs) );
 	}
