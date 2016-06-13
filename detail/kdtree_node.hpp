@@ -54,14 +54,65 @@ struct matches_partially<T,0>
 };
 
 template < typename T >
-struct kdtree_node_base
+struct quadtree_node
 {
 	// Constants
 	static constexpr std::size_t D = std::tuple_size<T>::value; //!< Specifies the number of dimensions
 
 	// Type members
-	typedef kdtree_node_base<T>   Node;
-	typedef std::array<Node*,2*D> SuccessorTable;
+	typedef T                     Key;
+	typedef quadtree_node<T>        Node;
+	typedef std::array<Node*,power(2,D)> SuccessorTable;
+
+	constexpr
+	std::size_t find_spot( const Key& k, std::size_t dim = D-1 )
+	{
+		return dim==0?
+			std::get<dim>(_key) < std::get<dim>(k) :
+			(std::get<dim>(_key) < std::get<dim>(k))<<dim;
+	}
+
+	// Function members
+	bool insert( const Key& k )
+	{
+		bool inserted = false;
+		std::size_t spot = find_spot(k);
+		// Note: spot is 0 if all dimension comparisons
+		// are greater or equal
+		if( spot == 0 && _key == k ) {
+			inserted = false;
+		} else if( _successor[spot] ) {
+			inserted = _successors[spot]->insert(k);
+		} else {
+			_successors[spot] = new quadtree_node(k);
+			inserted = true;
+		}
+		return inserted;
+	}
+
+	// Exact search
+	const Key* find( const Key& k ) const
+	{
+		std::size_t spot = find_spot(k);
+		if( spot == 0 && _key == k ) {
+			return &k;
+		} else if( _successor[spot] ) {
+			return _successor[spot]->find(k);
+		} else {
+			return nullptr;
+		}
+	}
+
+	// Partial match
+	std::list<const Key*> find( const Key& k, const mask_type<Key>& mask )
+	{
+		std::list<const Key*> list;
+		if( matches_partially<Key>()( _key, k, mask ) ) {
+			list.push_back(&_key);
+		}
+
+		return list;
+	}
 
 	// Data members
 	SuccessorTable _successors;
