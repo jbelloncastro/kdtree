@@ -218,7 +218,7 @@ struct relaxed_kdtree_node : public relaxed_kdtree_node_base<T> {
 				inserted = true;
 			}
 		}
-		return false;
+		return inserted;
 	}
 
 	// Exact search
