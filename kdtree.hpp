@@ -49,6 +49,12 @@ class generic_kdtree
 				insert( item );
 		}
 
+		~generic_kdtree()
+		{
+			if( _root )
+				delete _root;
+		}
+
 		bool empty() const
 		{
 			return !_root;

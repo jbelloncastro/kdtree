@@ -79,7 +79,11 @@ struct forward_partial_match<Node,-1>
 
 	std::list<const Key*> operator()( const Node& node, const Key& k, const Mask& m, std::size_t position )
 	{
-		return node._successors[position]->find( k, m );
+		std::list<const Key*> list;
+		if( node._successors[position] ) {
+			list = node._successors[position]->find( k, m );
+		}
+		return list;
 	}
 };
 
@@ -99,6 +103,13 @@ struct quadtree_node
 		_successors(),
 		_key(k)
 	{
+	}
+
+	~quadtree_node()
+	{
+		for( Node* successor: _successors )
+			if( successor )
+				delete successor;
 	}
 
 	// Function members

@@ -59,9 +59,10 @@ struct kdtree_node
 
 	~kdtree_node()
 	{
-		for( SuccessorNode* child: _successors ) {
-			if( child )
-				delete child;
+		for( SuccessorNode* successor: _successors ) {
+			if( successor ) {
+				delete successor;
+			}
 		}
 	}
 
@@ -82,7 +83,7 @@ struct kdtree_node
 			if( _successors[1] ) {
 				inserted = _successors[1]->insert(k2);
 			} else {
-				_successors[0] = SuccessorNode::create_node(k2);
+				_successors[1] = SuccessorNode::create_node(k2);
 				inserted = true;
 			}
 		}

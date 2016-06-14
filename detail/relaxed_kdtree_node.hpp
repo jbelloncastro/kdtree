@@ -55,9 +55,9 @@ struct relaxed_kdtree_node_base
 
 	virtual ~relaxed_kdtree_node_base()
 	{
-		for( Node* child: _successors ) {
-			if( child )
-				delete child;
+		for( Node* successor: _successors ) {
+			if( successor )
+				delete successor;
 		}
 	}
 
@@ -129,7 +129,7 @@ struct relaxed_kdtree_node : public relaxed_kdtree_node_base<T> {
 			if( this->_successors[1] ) {
 				inserted = this->_successors[1]->insert(k2);
 			} else {
-				this->_successors[0] = Base::create_node(k2);
+				this->_successors[1] = Base::create_node(k2);
 				inserted = true;
 			}
 		}
